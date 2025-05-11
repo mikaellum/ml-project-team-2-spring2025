@@ -1,9 +1,7 @@
 import os
 from tinytag import TinyTag
 import librosa
-import matplotlib.pyplot as plt
 import pandas as pd
-import numpy as np
 
 directory_path = '../Music Files'
 
