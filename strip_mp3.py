@@ -43,7 +43,7 @@ def open_all_files(directory):
                         df_arr.at[0, 'Ch0'] = y[0]
                         df_arr.at[0, 'Ch1'] = y[1]
                         df_mp3_row = pd.concat([df_mp3_info, df_arr], axis = 1) # Concatonate the info and array into a single row
-                        df_mp3 = pd.concat([df_mp3, df_mp3_row], axis = 0)
+                        df_mp3 = pd.concat([df_mp3, df_mp3_row], axis = 0, ignore_index = True)
                 except Exception as e:
                     print(f"Error opening {filename}: {e}")
         return df_mp3
