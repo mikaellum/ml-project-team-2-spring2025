@@ -57,6 +57,7 @@ def open_all_files(directory):
 try:
    df = open_all_files(directory_path)
    print(df)
+   df.to_pickle('example.pkl')
 except (FileNotFoundError, Exception) as e:
    print(e)
 
