@@ -1,9 +1,13 @@
+import os
 from tinytag import TinyTag
 import librosa
 import matplotlib.pyplot as plt
+import pandas as pd
+import numpy as np
 
-file_name = '04 - Girl on Fire (Instrumental Version).mp3'
+directory_path = '../Music Files'
 
+# Function that pulls all header information from an mp3
 def get_mp3_header_info(file_path):
    try:
        tag = TinyTag.get(file_path)
@@ -19,19 +23,42 @@ def get_mp3_header_info(file_path):
            'genre': tag.genre,
            'track': tag.track
        }
-       return header_info
+       return pd.DataFrame([header_info])
    except FileNotFoundError:
        raise FileNotFoundError(f"File not found: {file_path}")
    except Exception as e:
        raise Exception(f"Error processing MP3 file: {e}")
-# Example usage:
+
+# Function to open all files in a directory
+def open_all_files(directory):
+    df_mp3 = pd.DataFrame()
+    try:
+        for filename in os.listdir(directory):
+            filepath = os.path.join(directory, filename)
+            if os.path.isfile(filepath):  # Ensure it's a file, not a subdirectory
+                try:
+                    with open(filepath, 'r') as file:
+                        # Process the file content here
+                        df_mp3_info = get_mp3_header_info(filepath)
+                        y, _ = librosa.load(filepath, mono=False)
+                        df_arr = pd.DataFrame(columns = ['Ch0','Ch1'])
+                        df_arr.at[0, 'Ch0'] = y[0]
+                        df_arr.at[0, 'Ch1'] = y[1]
+                        df_mp3_row = pd.concat([df_mp3_info, df_arr], axis = 1) # Concatonate the info and array into a single row
+                        df_mp3 = pd.concat([df_mp3, df_mp3_row], axis = 0)
+                except Exception as e:
+                    print(f"Error opening {filename}: {e}")
+        return df_mp3
+    except FileNotFoundError:
+        print(f"Directory not found: {directory}")
+    except Exception as e:
+         print(f"An error occurred: {e}")
+    
+
+# Example Use:
 try:
-   mp3_info = get_mp3_header_info(file_name)
-   print(mp3_info)
-   y, sr = librosa.load(file_name, mono=False)
-   plt.figure()
-   plt.plot(y[0])
-   plt.show()
+   df = open_all_files(directory_path)
+   print(df)
 except (FileNotFoundError, Exception) as e:
    print(e)
 
